@@ -3,7 +3,7 @@ from anthropic.types import Message
 
 
 class ClaudeProvider:
-    def __init__(self, model: str):
+    def __init__(self, model: str, *args, **kwargs):
         self.client = Anthropic()
         self.model = model
 

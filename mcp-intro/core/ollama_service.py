@@ -2,8 +2,8 @@ from ollama import Client
 from ollama import Message, ChatResponse
 
 class OllamaProvider:
-    def __init__(self, model: str):
-        self.client = Client
+    def __init__(self, model: str, *args, **kwargs):
+        self.client = Client()
         self.model = model
     
     def add_user_message(self, messages: list[dict], message: str) -> None:
@@ -37,10 +37,7 @@ class OllamaProvider:
     ) -> Message:
         params = {
             "model": self.model,
-            "max_tokens": 8000,
             "messages": messages,
-            "temperature": temperature,
-            "stop_sequences": stop_sequences
         }
 
         if thinking:

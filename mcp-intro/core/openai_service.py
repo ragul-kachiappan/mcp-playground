@@ -1,7 +1,7 @@
 from typing import Any
 
 class OpenAIProvider:
-    def __init__(self, model: str) -> None:
+    def __init__(self, model: str, *args, **kwargs) -> None:
         self.client = None
         self.model = model
     

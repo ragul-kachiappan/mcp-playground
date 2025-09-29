@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from contextlib import AsyncExitStack
 
 from mcp_client import MCPClient
-from core.llm_provider import LLMClient, LLMFactory
+from core.llm_provider import LLMFactory
 from core.base import ProviderType
 
 from core.cli_chat import CliChat

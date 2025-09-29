@@ -22,24 +22,25 @@ class Chat:
         await self._process_query(query)
 
         while True:
-            response = self.claude_service.chat(
+            response = self.llm_service.chat(
                 messages=self.messages,
                 tools=await ToolManager.get_all_tools(self.clients),
             )
 
-            self.claude_service.add_assistant_message(self.messages, response)
+            self.llm_service.add_assistant_message(self.messages, response)
 
+            # TODO fix this issue. Message object has no attribute stop reason
             if response.stop_reason == "tool_use":
-                print(self.claude_service.text_from_message(response))
+                print(self.llm_service.text_from_message(response))
                 tool_result_parts = await ToolManager.execute_tool_requests(
                     self.clients, response
                 )
 
-                self.claude_service.add_user_message(
+                self.llm_service.add_user_message(
                     self.messages, tool_result_parts
                 )
             else:
-                final_text_response = self.claude_service.text_from_message(
+                final_text_response = self.llm_service.text_from_message(
                     response
                 )
                 break

@@ -1,10 +1,10 @@
 from typing import Any
 
-from base import LLMProvider, ProviderType
-from claude_service import ClaudeProvider
-from gemini_service import GeminiProvider
-from openai_service import OpenAIProvider
-from ollama_service import OllamaProvider
+from core.base import LLMProvider, ProviderType
+from core.claude_service import ClaudeProvider
+from core.gemini_service import GeminiProvider
+from core.openai_service import OpenAIProvider
+from core.ollama_service import OllamaProvider
 
 class LLMFactory:
     """Factory class to create LLM provider instances"""
