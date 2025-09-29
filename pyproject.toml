@@ -1,0 +1,14 @@
+[project]
+name = "mcp-playground"
+version = "0.1.0"
+description = "Repo for doing MCP course from Anthropic"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "anthropic>=0.51.0",
+    "google-genai>=1.39.1",
+    "mcp[cli]>=1.8.0",
+    "ollama>=0.6.0",
+    "prompt-toolkit>=3.0.51",
+    "python-dotenv>=1.1.0",
+]
