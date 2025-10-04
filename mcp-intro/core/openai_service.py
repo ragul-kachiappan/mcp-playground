@@ -1,6 +1,10 @@
 from typing import Any
+from core.base import ProviderType
 
 class OpenAIProvider:
+    
+    _provider_type: ProviderType = None
+
     def __init__(self, model: str, *args, **kwargs) -> None:
         self.client = None
         self.model = model
@@ -12,6 +16,10 @@ class OpenAIProvider:
         raise NotImplementedError()
     
     def text_from_message(self, message: dict) -> str:
+        raise NotImplementedError()
+    
+    def has_tool_calls(self, response: Any) -> bool:
+        """Check if the response contains tool calls"""
         raise NotImplementedError()
     
     def chat(

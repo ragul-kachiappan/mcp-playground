@@ -4,6 +4,7 @@ from mcp.server.fastmcp import FastMCP
 
 from pydantic import Field
 from mcp.server.fastmcp.prompts import base
+from pydantic.type_adapter import P
 
 mcp = FastMCP("DocumentMCP", log_level="ERROR")
 
@@ -76,8 +77,27 @@ def format_document(
     """
 
     return [base.UserMessage(prompt)]
-# TODO: Write a prompt to summarize a doc
 
+@mcp.prompt(
+    name="summarize",
+    description="Summarizes contents of the given document."
+)
+def summarize_document(
+    doc_id: str = Field(description="Id of the document to summarize"),
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to summarize a document that is digestible to the user.
+
+    The id of the document you need to summarize is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    Add in extra pointers if needed. 
+    """
+
+    return [base.UserMessage(prompt)]
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
+

@@ -1,8 +1,12 @@
 from anthropic import Anthropic
 from anthropic.types import Message
+from core.base import ProviderType
 
 
 class ClaudeProvider:
+
+    _provider_type: ProviderType = None
+
     def __init__(self, model: str, api_key: str, *args, **kwargs):
         self.client = Anthropic(api_key=api_key)
         self.model = model
@@ -29,6 +33,10 @@ class ClaudeProvider:
         return "\n".join(
             [block.text for block in message.content if block.type == "text"]
         )
+    
+    def has_tool_calls(self, response: Message) -> bool:
+        """Check if the response contains tool calls"""
+        return response.stop_reason == "tool_use"
 
     def chat(
         self,

@@ -1,7 +1,11 @@
 from ollama import Client
 from ollama import Message, ChatResponse
+from core.base import ProviderType
 
 class OllamaProvider:
+
+    _provider_type: ProviderType = None
+
     def __init__(self, model: str, *args, **kwargs):
         self.client = Client()
         self.model = model
@@ -23,6 +27,10 @@ class OllamaProvider:
     
     def text_from_message(self, message: Message) -> str:
         return message.content
+    
+    def has_tool_calls(self, response: Message) -> bool:
+        """Check if the response contains tool calls"""
+        return hasattr(response, 'tool_calls') and response.tool_calls is not None
     
     def chat(
         self,

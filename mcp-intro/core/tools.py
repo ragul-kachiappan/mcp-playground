@@ -3,23 +3,65 @@ from typing import Optional, Literal, List
 from mcp.types import CallToolResult, Tool, TextContent
 from mcp_client import MCPClient
 from anthropic.types import Message, ToolResultBlockParam
+from core.base import LLMProvider, ProviderType
 
 
 class ToolManager:
+    @staticmethod
+    def ollama_tool_schema_dict(mcp_tool: Tool) -> dict:
+        """Convert MCP-Claude tool schema object to Ollama tool schema dict"""
+        mcp_properties = mcp_tool.inputSchema.get('properties')
+        ollama_properties = {}
+        
+        for prop_name, prop_def in mcp_properties.items():
+            ollama_properties[prop_name] = {
+                'type': prop_def.get('type'),
+                'description': prop_def.get('description', prop_def.get('title', ''))
+            }
+            
+            # Handle additional properties like enum, items, etc.
+            if 'enum' in prop_def:
+                ollama_properties[prop_name]['enum'] = prop_def['enum']
+            if 'items' in prop_def:
+                ollama_properties[prop_name]['items'] = prop_def['items']
+        return {
+        'type': 'function',
+        'function': {
+            'name': mcp_tool.name,
+            'description': mcp_tool.description,
+            'parameters': {
+                'type': 'object',
+                'properties': ollama_properties,
+                'required': mcp_tool.inputSchema.get('required', [])
+            }
+        }
+    }
+
+    @staticmethod
+    def mcp_tool_schema_dict(mcp_tool: Tool) -> dict:
+        """Convert MCP-Claude tool schema object to dict"""
+        return {
+                    "name": mcp_tool.name,
+                    "description": mcp_tool.description,
+                    "input_schema": mcp_tool.inputSchema,
+                }
+
+
     @classmethod
-    async def get_all_tools(cls, clients: dict[str, MCPClient]) -> list[Tool]:
+    async def get_all_tools(cls, clients: dict[str, MCPClient], llm_service: LLMProvider ) -> list[dict]:
         """Gets all tools from the provided clients."""
         tools = []
         for client in clients.values():
             tool_models = await client.list_tools()
-            tools += [
-                {
-                    "name": t.name,
-                    "description": t.description,
-                    "input_schema": t.inputSchema,
-                }
-                for t in tool_models
-            ]
+            for t in tool_models:
+                match llm_service._provider_type: 
+                    case ProviderType.OLLAMA:
+                        tool_dict = ToolManager.ollama_tool_schema_dict(t)
+                    case ProviderType.CLAUDE:
+                        tool_dict = ToolManager.mcp_tool_schema_dict(t)
+                    case _:
+                        raise NotImplementedError()
+                tools.append(tool_dict)
         return tools
 
     @classmethod
@@ -49,6 +91,7 @@ class ToolManager:
             "is_error": status == "error",
         }
 
+    # TODO need to make it generic to handle all llm providers
     @classmethod
     async def execute_tool_requests(
         cls, clients: dict[str, MCPClient], message: Message
