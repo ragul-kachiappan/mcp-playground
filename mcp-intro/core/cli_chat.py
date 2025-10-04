@@ -54,7 +54,6 @@ class CliChat(Chat):
 
         words = query.split()
         command = words[0].replace("/", "")
-
         messages = await self.doc_client.get_prompt(
             command, {"doc_id": words[1]}
         )

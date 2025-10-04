@@ -27,9 +27,11 @@ class Chat:
                 tools=await ToolManager.get_all_tools(self.clients),
             )
 
-            self.llm_service.add_assistant_message(self.messages, response)
+            self.llm_service.add_assistant_message(self.messages, response.content)
 
-            # TODO fix this issue. Message object has no attribute stop reason
+            # TODO fix this issue. Message object has no attribute stop reason in ollama
+            # TODO tool schema varies between claude and ollama. Need to build an adapter. 
+            # NOTE tool call works sketchy in low param models. Do notice.
             if response.stop_reason == "tool_use":
                 print(self.llm_service.text_from_message(response))
                 tool_result_parts = await ToolManager.execute_tool_requests(

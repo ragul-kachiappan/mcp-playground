@@ -14,8 +14,6 @@ from core.cli import CliApp
 load_dotenv()
 
 # LLM Config
-claude_model = os.getenv("CLAUDE_MODEL", "")
-anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "")
 PROVIDER= os.getenv("PROVIDER", "ollama")
 MODEL= os.getenv("MODEL", "gemma3:12b")
 API_KEY=os.getenv ("API_KEY", "")
@@ -30,7 +28,10 @@ if PROVIDER != ProviderType.OLLAMA.value:
 
 
 async def main():
-    llm_service = LLMFactory.create_provider(provider_type=ProviderType(PROVIDER), model=MODEL)
+    if PROVIDER == ProviderType.OLLAMA.value:
+        llm_service = LLMFactory.create_provider(provider_type=ProviderType(PROVIDER), model=MODEL)
+    else:
+        llm_service = LLMFactory.create_provider(provider_type=ProviderType(PROVIDER), model=MODEL, api_key=API_KEY)
 
     server_scripts = sys.argv[1:]
     clients = {}
